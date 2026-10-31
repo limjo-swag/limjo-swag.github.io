@@ -54,7 +54,7 @@
       inset 0 -1px 1px rgba(255,255,255,.12),
       inset 0 0 40px rgba(255,255,255,.05),
       0 30px 80px rgba(0,0,0,.55),
-      0 0 60px rgba(182,107,255,.12);
+      0 0 calc(60px + var(--beat,0)*70px) rgba(182,107,255,calc(.12 + var(--beat,0)*.3));
     transform-style:preserve-3d;transition:transform .25s ease-out;
     opacity:0;transform:translateY(30px) scale(.96);
   }
@@ -72,7 +72,8 @@
   .avatar{width:96px;height:96px;margin:0 auto 16px;border-radius:50%;position:relative;
     display:grid;place-items:center;font-size:38px;font-weight:800;color:#fff;
     background:linear-gradient(135deg,#7b3fe4,#c56bff);
-    box-shadow:0 0 0 3px rgba(255,255,255,.18),0 0 34px rgba(182,107,255,.55),inset 0 2px 4px rgba(255,255,255,.4);
+    box-shadow:0 0 0 3px rgba(255,255,255,.18),0 0 calc(34px + var(--beat,0)*40px) rgba(182,107,255,calc(.55 + var(--beat,0)*.4)),inset 0 2px 4px rgba(255,255,255,.4);
+    transform:scale(calc(1 + var(--beat,0)*.08));
     overflow:hidden}
   .avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
@@ -113,7 +114,7 @@
   .link span{flex:1;text-align:center;margin-right:24px}
 
   /* ---------- MUSIC PLAYER ---------- */
-  .player{margin-top:16px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;
+  .player{margin-top:16px;display:flex;flex-direction:column;gap:10px;padding:12px 16px 10px;border-radius:26px;
     background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
     border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.3);
     opacity:0}
@@ -124,7 +125,39 @@
   #pp svg{width:16px;height:16px;fill:currentColor}
   .track{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .track b{color:var(--text);font-weight:600}
-  #vol{width:78px;accent-color:var(--accent);height:3px}
+  .prow{display:flex;align-items:center;gap:10px}
+  .ctrl{display:flex;align-items:center;gap:4px;flex:none}
+  .pbtn{width:30px;height:30px;border:0;background:transparent;color:rgba(255,255,255,.85);border-radius:50%;
+    display:grid;place-items:center;transition:transform .2s,color .2s}
+  .pbtn:hover{transform:scale(1.15);color:#fff}
+  .pbtn svg{width:16px;height:16px;fill:currentColor}
+  .prog{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .prog span{min-width:34px}
+  #tLeft{text-align:right}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;outline:none;border:0;
+    background:linear-gradient(90deg,var(--accent) var(--p,0%),rgba(255,255,255,.2) var(--p,0%))}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;
+    background:#fff;border:0;box-shadow:0 0 8px var(--accent)}
+  input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:#fff;border:0;box-shadow:0 0 8px var(--accent)}
+  #vol{width:72px;flex:none}
+  #seek{flex:1;min-width:0}
+  @media (max-width:420px){#vol{width:48px}}
+
+  /* ---------- DYNAMIC ISLAND ---------- */
+  #island{position:fixed;top:14px;left:50%;z-index:100;transform:translateX(-50%);
+    width:110px;height:32px;border-radius:20px;background:#000;color:#fff;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;
+    box-shadow:0 0 0 1px rgba(255,255,255,.08),0 12px 40px rgba(0,0,0,.6);
+    transition:width .55s cubic-bezier(.3,1.5,.4,1),height .55s cubic-bezier(.3,1.5,.4,1),
+      border-radius .55s cubic-bezier(.3,1.5,.4,1),opacity .25s}
+  #island.show{opacity:1;width:230px;height:56px;border-radius:32px}
+  #island .in{display:flex;align-items:center;gap:12px;white-space:nowrap;opacity:0;transform:scale(.7);
+    transition:opacity .2s,transform .3s}
+  #island.show .in{opacity:1;transform:scale(1);transition:opacity .3s .2s,transform .45s cubic-bezier(.3,1.5,.4,1) .15s}
+  #island .ok{width:30px;height:30px;padding:6px;border-radius:50%;background:#30d158;fill:#fff;flex:none}
+  #island .txt{display:flex;flex-direction:column;line-height:1.25;text-align:left}
+  #island b{font-size:14px;font-weight:700}
+  #island small{font-size:12px;color:rgba(255,255,255,.6)}
 
   /* ---------- SOUND BUTTON ---------- */
   #snd{position:fixed;right:20px;bottom:20px;z-index:20;width:46px;height:46px;border-radius:50%;
@@ -153,8 +186,7 @@
 <div id="bg-fallback"></div>
 <video id="bg-video" src="rain.mp4" loop muted playsinline preload="auto"></video>
 <canvas id="rain"></canvas>
-<!-- Положи трек рядом с index.html и назови track.mp3 -->
-<audio id="music" src="track.mp3" loop preload="auto"></audio>
+<audio id="music" preload="auto"></audio>
 <div class="vignette"></div>
 
 <div id="enter"><span>press to continue</span></div>
@@ -170,27 +202,38 @@
     <p class="sub"><span id="typed"></span><i></i></p>
 
     <nav class="links">
-      <a class="link" href="https://steamcommunity.com/id/ТВОЙ_НИК" target="_blank" rel="noopener">
+      <a class="link" href="https://steamcommunity.com/profiles/76561198823972532/" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M12 0a12 12 0 0 0-12 11.4l6.4 2.6a3.4 3.4 0 0 1 1.9-.6h.2l2.9-4.1v-.1a4.5 4.5 0 1 1 4.5 4.5h-.1l-4.1 3a3.4 3.4 0 0 1-6.7.8L.4 15.4A12 12 0 1 0 12 0Zm-4.5 18.2-1.5-.6a2.6 2.6 0 0 0 4.9-.3 2.6 2.6 0 0 0-1.9-3.4l1.6.6a1.9 1.9 0 1 1-3.1 3.7Zm9-6.4a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0-.8a2.2 2.2 0 1 0 0-4.5 2.2 2.2 0 0 0 0 4.5Z"/></svg>
         <span>Steam Профиль</span>
       </a>
-      <a class="link" href="https://t.me/ТВОЙ_НИК" target="_blank" rel="noopener">
+      <a class="link" href="https://t.me/fuckedmanagment" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M9.8 15.3 9.4 20c.6 0 .9-.3 1.2-.6l2.9-2.8 6 4.4c1.1.6 1.9.3 2.2-1L24 3.6c.4-1.6-.6-2.2-1.6-1.8L1.2 10c-1.5.6-1.5 1.4-.3 1.8l5.4 1.7L19 5.6c.6-.4 1.1-.2.7.2L9.8 15.3Z"/></svg>
         <span>Telegram</span>
       </a>
-      <a class="link" href="https://discord.com/users/ТВОЙ_ID" target="_blank" rel="noopener">
+      <a class="link" id="discord" href="#">
         <svg viewBox="0 0 24 24"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.6 1.3a18.3 18.3 0 0 0-5.6 0L8.6 3a19.7 19.7 0 0 0-4.9 1.5C.6 9 -.2 13.4.2 17.8a19.9 19.9 0 0 0 6 3l1.3-2.1c-.7-.3-1.4-.6-2-1l.5-.4a14.2 14.2 0 0 0 12 0l.5.4c-.6.4-1.300.7-2 1l1.300 2.100a19.800 19.800 0 0 0 6-3c.5-5.100-.800-9.500-3.500-13.400ZM8 15.100c-1.200 0-2.100-1.100-2.100-2.400s.9-2.400 2.100-2.400 2.100 1.100 2.100 2.400-.9 2.400-2.100 2.400Zm8 0c-1.200 0-2.100-1.100-2.100-2.400s.9-2.400 2.100-2.400 2.100 1.100 2.100 2.400-.9 2.400-2.100 2.400Z"/></svg>
         <span>Discord</span>
       </a>
     </nav>
 
     <div class="player" id="player">
-      <button id="pp" aria-label="Играть / пауза">
-        <svg id="ico-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
-        <svg id="ico-play" viewBox="0 0 24 24" style="display:none"><path d="M7 4v16l13-8z"/></svg>
-      </button>
-      <div class="track">♪ <b id="trackName"></b></div>
-      <input type="range" id="vol" min="0" max="100" value="50" aria-label="Громкость">
+      <div class="prow">
+        <div class="ctrl">
+          <button class="pbtn" id="prev" aria-label="Предыдущий"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14L9 12z"/></svg></button>
+          <button id="pp" aria-label="Играть / пауза">
+            <svg id="ico-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+            <svg id="ico-play" viewBox="0 0 24 24" style="display:none"><path d="M7 4v16l13-8z"/></svg>
+          </button>
+          <button class="pbtn" id="next" aria-label="Следующий"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg></button>
+        </div>
+        <div class="track">♪ <b id="trackName"></b></div>
+        <input type="range" id="vol" min="0" max="100" value="50" aria-label="Громкость">
+      </div>
+      <div class="prog">
+        <span id="tCur">0:00</span>
+        <input type="range" id="seek" min="0" max="1000" value="0" aria-label="Перемотка">
+        <span id="tLeft">-0:00</span>
+      </div>
     </div>
   </section>
 </main>
@@ -200,6 +243,13 @@
   <svg id="ico-off" viewBox="0 0 24 24" style="display:none"><path d="M16.500 12A4.500 4.500 0 0 0 14 8v2.200l2.500 2.500V12ZM19 12a6.800 6.800 0 0 1-.900 3.400l1.500 1.500A8.800 8.800 0 0 0 21 12a9 9 0 0 0-7-8.800v2.100A7 7 0 0 1 19 12ZM4.300 3 3 4.300 7.700 9H3v6h4l5 5v-6.700l4.200 4.200c-.7.500-1.400.9-2.200 1.200v2.100a9 9 0 0 0 3.600-1.800l2.100 2.100 1.300-1.300L4.300 3ZM12 4 9.900 6.100 12 8.200V4Z"/></svg>
 </button>
 
+<div id="island">
+  <div class="in">
+    <svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
+    <div class="txt"><b id="islTitle"></b><small id="islSub"></small></div>
+  </div>
+</div>
+
 <div class="cur-ring" id="ring"></div>
 <div class="cur-dot" id="dot"></div>
 
@@ -207,8 +257,12 @@
 (() => {
   const $ = s => document.querySelector(s);
   const video = $('#bg-video'), enter = $('#enter'), card = $('#card'), music = $('#music');
-  const TRACK_NAME = 'название трека'; // ← впиши сюда название
-  $('#trackName').textContent = TRACK_NAME;
+  // ← Треки: файл лежит рядом с index.html, name — то, что покажется в плеере
+  const TRACKS = [
+    { src: 'track.mp3',  name: 'трек 1' },
+    { src: 'track2.mp3', name: 'трек 2' },
+    { src: 'track3.mp3', name: 'трек 3' },
+  ];
   const SUBTITLE = Array.from('🌧🌧🌧');
 
   /* ---------- Видео / запасной дождь ---------- */
@@ -224,6 +278,7 @@
     enter.classList.add('hide');
     video.muted = false; video.volume = .3;      // дождь тише, чтобы музыка была главной
     music.volume = $('#vol').value / 100;
+    initAudio();
     music.play().then(updatePP).catch(updatePP);
     video.play().catch(() => { video.muted = true; video.play().catch(()=>{}); syncIcon(); });
     syncIcon();
@@ -244,13 +299,86 @@
   });
 
   /* ---------- Музыка ---------- */
+  const seek = $('#seek'), vol = $('#vol');
+  const failed = new Set();                       // треки, файлов которых нет
+  let cur = 0, userPaused = false, dragging = false;
+  const fmt = s => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const setP = (el, v) => el.style.setProperty('--p', v + '%');
+
   function updatePP(){
     $('#ico-pause').style.display = music.paused ? 'none' : '';
     $('#ico-play').style.display  = music.paused ? '' : 'none';
   }
-  $('#pp').addEventListener('click', () => { music.paused ? music.play() : music.pause(); updatePP(); });
-  $('#vol').addEventListener('input', e => music.volume = e.target.value / 100);
-  music.addEventListener('error', () => $('#player').style.display = 'none'); // нет трека — плеера нет
+  function pick(from, dir){
+    const n = TRACKS.length;
+    for (let k = 1; k <= n; k++){
+      const i = (((from + dir * k) % n) + n) % n;
+      if (!failed.has(i)) return i;
+    }
+    return -1;
+  }
+  function load(i, play){
+    cur = i; music.src = TRACKS[i].src;
+    $('#trackName').textContent = TRACKS[i].name;
+    seek.value = 0; setP(seek, 0);
+    $('#tCur').textContent = '0:00'; $('#tLeft').textContent = '-0:00';
+    if (play) music.play().then(updatePP).catch(updatePP); else updatePP();
+  }
+  function step(dir){
+    const i = pick(cur, dir);
+    if (i < 0) { $('#player').style.display = 'none'; return; }   // ни одного трека нет — плеера нет
+    load(i, entered && !userPaused);
+  }
+
+  $('#pp').addEventListener('click', () => {
+    if (music.paused) { userPaused = false; music.play(); } else { userPaused = true; music.pause(); }
+    updatePP();
+  });
+  $('#next').addEventListener('click', () => { userPaused = false; step(1); });
+  $('#prev').addEventListener('click', () => { userPaused = false; step(-1); });
+  music.addEventListener('ended', () => step(1));                  // трек кончился — следующий
+  music.addEventListener('error', () => { failed.add(cur); step(1); });
+  music.addEventListener('play', updatePP);
+  music.addEventListener('pause', updatePP);
+
+  music.addEventListener('loadedmetadata', () => $('#tLeft').textContent = '-' + fmt(music.duration));
+  music.addEventListener('timeupdate', () => {
+    const d = music.duration || 0;
+    $('#tCur').textContent  = fmt(music.currentTime);
+    $('#tLeft').textContent = '-' + fmt(d - music.currentTime);   // сколько осталось
+    if (!dragging && d){ const p = music.currentTime / d * 1000; seek.value = p; setP(seek, p / 10); }
+  });
+  seek.addEventListener('pointerdown', () => dragging = true);
+  addEventListener('pointerup', () => dragging = false);
+  seek.addEventListener('input', () => {
+    setP(seek, seek.value / 10);
+    if (music.duration) music.currentTime = seek.value / 1000 * music.duration;
+  });
+  vol.addEventListener('input', () => { music.volume = vol.value / 100; setP(vol, vol.value); });
+  setP(vol, vol.value);
+  load(0, false);
+
+  /* ---------- Dynamic Island ---------- */
+  const island = $('#island'); let islandT;
+  function pop(title, sub){
+    $('#islTitle').textContent = title; $('#islSub').textContent = sub;
+    island.classList.add('show'); clearTimeout(islandT);
+    islandT = setTimeout(() => island.classList.remove('show'), 2200);
+  }
+  async function copy(text){
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const t = document.createElement('textarea'); t.value = text;
+      t.style.cssText = 'position:fixed;opacity:0'; document.body.appendChild(t); t.select();
+      try { document.execCommand('copy'); } catch {}
+      t.remove();
+    }
+  }
+  $('#discord').addEventListener('click', async e => {
+    e.preventDefault();
+    await copy('firesh00ter');
+    pop('Скопировано', 'firesh00ter');
+  });
 
   /* ---------- Печатающийся подзаголовок ---------- */
   function typeText(){
@@ -260,6 +388,38 @@
       if (i < SUBTITLE.length) setTimeout(tick, 70 + Math.random()*60);
     }, 1100);
   }
+
+  /* ---------- Бас: виджет дёргается под музыку ---------- */
+  let analyser, freq, env = 0, peak = .35;
+  function initAudio(){
+    // работает на сайте (http/https); при открытии файла двойным кликом браузер глушит анализ
+    if (analyser || !/^https?:/.test(location.protocol)) return;
+    try {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      const actx = new AC();
+      const node = actx.createMediaElementSource(music);
+      analyser = actx.createAnalyser();
+      analyser.fftSize = 1024; analyser.smoothingTimeConstant = .6;
+      node.connect(analyser); analyser.connect(actx.destination);
+      freq = new Uint8Array(analyser.frequencyBinCount);
+      actx.resume();
+    } catch (e) { analyser = null; }
+  }
+  (function beat(){
+    let target = 0;
+    if (analyser && !music.paused){
+      analyser.getByteFrequencyData(freq);
+      let s = 0; for (let i = 1; i <= 5; i++) s += freq[i];     // низкие частоты ~40–220 Гц
+      const lvl = s / 5 / 255;
+      peak = Math.max(lvl, peak * .995);                        // подстраивается под громкость трека
+      target = Math.pow(Math.max(0, lvl / Math.max(peak, .15)), 3);   // реагирует на сильные удары
+    }
+    env += (target - env) * (target > env ? .55 : .12);         // быстрый удар, плавный спад
+    card.style.setProperty('--beat', env.toFixed(3));
+    card.style.scale = 1 + env * .022;                          // сила «дёрганья» — число .022
+    video.style.filter = `brightness(${(.62 + env * .14).toFixed(3)}) saturate(1.1)`;
+    requestAnimationFrame(beat);
+  })();
 
   /* ---------- Курсор ---------- */
   const dot = $('#dot'), ring = $('#ring');
@@ -274,7 +434,7 @@
     requestAnimationFrame(loop);
   })();
   document.addEventListener('mouseover', e => {
-    ring.classList.toggle('hover', !!e.target.closest('a,button,#enter'));
+    ring.classList.toggle('hover', !!e.target.closest('a,button,input,#enter'));
   });
   addEventListener('mousedown', () => ring.classList.add('down'));
   addEventListener('mouseup',   () => ring.classList.remove('down'));
