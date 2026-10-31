@@ -1,169 +1,320 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>limjo-swag</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>@половинкаменя</title>
+<style>
+  :root{
+    --accent:#b66bff;
+    --text:#f4eeff;
+    --muted:rgba(240,230,255,.62);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;overflow:hidden;background:#05070a;color:var(--text);
+    font-family:"Inter","Segoe UI",system-ui,-apple-system,sans-serif}
+  @media (hover:hover) and (pointer:fine){ *{cursor:none!important} }
 
-        body {
-            background: radial-gradient(circle at center, #1a0b2e 0%, #090514 100%);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            position: relative;
-        }
+  /* ---------- BACKGROUND ---------- */
+  #bg-video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;
+    filter:brightness(.62) saturate(1.1);transform:scale(1.04)}
+  #bg-fallback{position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(ellipse at 50% 120%,#0f2a1f 0%,transparent 60%),
+      radial-gradient(ellipse at 20% 0%,#10281f 0%,transparent 55%),
+      linear-gradient(#070d0b,#0a1512 60%,#040807);}
+  #rain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.0;transition:opacity 1s}
+  body.no-video #rain{opacity:.9}
+  .vignette{position:fixed;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(ellipse at center,transparent 35%,rgba(0,0,0,.65) 100%)}
 
-        .bg-glow {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(45deg, #a855f7, #6366f1);
-            filter: blur(120px);
-            border-radius: 50%;
-            opacity: 0.3;
-            animation: floatGlow 8s ease-in-out infinite alternate;
-            z-index: 0;
-        }
+  /* ---------- ENTER SCREEN ---------- */
+  #enter{position:fixed;inset:0;z-index:50;display:grid;place-items:center;
+    background:rgba(4,6,8,.55);backdrop-filter:blur(22px) brightness(.7);
+    -webkit-backdrop-filter:blur(22px) brightness(.7);
+    transition:opacity .9s ease, visibility .9s, backdrop-filter .9s;user-select:none}
+  #enter.hide{opacity:0;visibility:hidden;backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0)}
+  #enter span{font-size:clamp(15px,2vw,19px);letter-spacing:.42em;text-transform:uppercase;
+    color:rgba(255,255,255,.8);animation:pulse 2.4s ease-in-out infinite;
+    text-shadow:0 0 18px rgba(182,107,255,.6)}
+  @keyframes pulse{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
 
-        @keyframes floatGlow {
-            0% { transform: translate(-50px, -50px) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.2); }
-        }
+  /* ---------- CARD (LIQUID GLASS) ---------- */
+  main{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:20px;
+    perspective:1200px}
+  .card{
+    --mx:50%;--my:0%;
+    position:relative;width:min(440px,100%);padding:34px 26px 28px;border-radius:34px;
+    background:linear-gradient(145deg,rgba(255,255,255,.14),rgba(255,255,255,.04));
+    backdrop-filter:blur(18px) saturate(1.8) brightness(1.05);
+    -webkit-backdrop-filter:blur(18px) saturate(1.8) brightness(1.05);
+    border:1px solid rgba(255,255,255,.16);
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,.55),
+      inset 0 -1px 1px rgba(255,255,255,.12),
+      inset 0 0 40px rgba(255,255,255,.05),
+      0 30px 80px rgba(0,0,0,.55),
+      0 0 60px rgba(182,107,255,.12);
+    transform-style:preserve-3d;transition:transform .25s ease-out;
+    opacity:0;transform:translateY(30px) scale(.96);
+  }
+  body.entered .card{animation:cardIn 1.1s cubic-bezier(.2,.9,.2,1) .25s forwards}
+  @keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1)}}
+  /* light that follows the mouse */
+  .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.22),transparent 60%);
+    mix-blend-mode:overlay}
+  /* glossy top edge */
+  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(180deg,rgba(255,255,255,.18),transparent 22%);
+    -webkit-mask:linear-gradient(#000,transparent 40%);mask:linear-gradient(#000,transparent 40%)}
 
-        .profile-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 40px 30px;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 420px;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            z-index: 1;
-            transform: translateY(20px);
-            animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+  .avatar{width:96px;height:96px;margin:0 auto 16px;border-radius:50%;position:relative;
+    display:grid;place-items:center;font-size:38px;font-weight:800;color:#fff;
+    background:linear-gradient(135deg,#7b3fe4,#c56bff);
+    box-shadow:0 0 0 3px rgba(255,255,255,.18),0 0 34px rgba(182,107,255,.55),inset 0 2px 4px rgba(255,255,255,.4);
+    overflow:hidden}
+  .avatar img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 
-        @keyframes fadeIn {
-            to { transform: translateY(0); opacity: 1; }
-        }
+  h1{text-align:center;font-size:32px;font-weight:900;letter-spacing:.06em;
+    background:linear-gradient(90deg,#d9b0ff,#a855f7,#d9b0ff);background-size:200% auto;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:shine 5s linear infinite;filter:drop-shadow(0 0 14px rgba(168,85,247,.45))}
+  @keyframes shine{to{background-position:200% center}}
+  .sub{text-align:center;margin:8px 0 26px;font-size:15px;color:var(--muted);min-height:1.4em}
+  .sub i{display:inline-block;width:1px;height:1em;background:var(--muted);margin-left:2px;
+    vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
 
-        .avatar {
-            width: 110px;
-            height: 110px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(168, 85, 247, 0.6);
-            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-            margin-bottom: 20px;
-            transition: transform 0.5s ease;
-        }
+  .links{display:grid;gap:12px}
+  .link{
+    position:relative;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:20px;
+    color:var(--text);text-decoration:none;font-weight:600;font-size:16px;overflow:hidden;
+    background:linear-gradient(135deg,rgba(255,255,255,.12),rgba(255,255,255,.03));
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.35),0 6px 18px rgba(0,0,0,.25);
+    transition:transform .3s cubic-bezier(.2,.9,.2,1),background .3s,border-color .3s,box-shadow .3s;
+    opacity:0;transform:translateY(14px)}
+  body.entered .link{animation:linkIn .7s cubic-bezier(.2,.9,.2,1) forwards}
+  body.entered .link:nth-child(1){animation-delay:.7s}
+  body.entered .link:nth-child(2){animation-delay:.82s}
+  body.entered .link:nth-child(3){animation-delay:.94s}
+  @keyframes linkIn{to{opacity:1;transform:translateY(0)}}
+  .link::before{content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.25),transparent);
+    transform:skewX(-20deg);transition:left .7s ease}
+  .link:hover::before{left:140%}
+  .link:hover{transform:translateY(-3px) scale(1.02);
+    background:linear-gradient(135deg,rgba(182,107,255,.28),rgba(255,255,255,.06));
+    border-color:rgba(200,150,255,.45);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.5),0 12px 30px rgba(120,60,220,.35)}
+  .link:active{transform:scale(.98)}
+  .link svg{width:24px;height:24px;flex:none;fill:currentColor;opacity:.92}
+  .link span{flex:1;text-align:center;margin-right:24px}
 
-        .avatar:hover {
-            transform: rotate(360deg) scale(1.05);
-        }
+  /* ---------- MUSIC PLAYER ---------- */
+  .player{margin-top:16px;display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:999px;
+    background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.12);box-shadow:inset 0 1px 1px rgba(255,255,255,.3);
+    opacity:0}
+  body.entered .player{animation:linkIn .7s cubic-bezier(.2,.9,.2,1) 1.1s forwards}
+  #pp{width:34px;height:34px;flex:none;border-radius:50%;border:0;color:#fff;display:grid;place-items:center;
+    background:linear-gradient(135deg,#7b3fe4,#c56bff);box-shadow:0 0 16px rgba(182,107,255,.5);transition:transform .2s}
+  #pp:hover{transform:scale(1.1)}
+  #pp svg{width:16px;height:16px;fill:currentColor}
+  .track{flex:1;min-width:0;font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .track b{color:var(--text);font-weight:600}
+  #vol{width:78px;accent-color:var(--accent);height:3px}
 
-        .nickname {
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            background: linear-gradient(90deg, #fff, #a855f7, #6366f1, #fff);
-            background-size: 300% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: textGradient 4s linear infinite;
-            margin-bottom: 8px;
-        }
+  /* ---------- SOUND BUTTON ---------- */
+  #snd{position:fixed;right:20px;bottom:20px;z-index:20;width:46px;height:46px;border-radius:50%;
+    display:grid;place-items:center;border:1px solid rgba(255,255,255,.18);color:#fff;
+    background:rgba(255,255,255,.08);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.4);opacity:0;transition:opacity .6s 1.2s,transform .2s}
+  body.entered #snd{opacity:1}
+  #snd:hover{transform:scale(1.1)}
+  #snd svg{width:20px;height:20px;fill:currentColor}
 
-        @keyframes textGradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .status {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 30px;
-            font-weight: 400;
-        }
-
-        .links-container {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .btn-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 14px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: #f1f5f9;
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: 0.5s;
-        }
-
-        .btn-link:hover::before {
-            left: 100%;
-        }
-
-        .btn-link:hover {
-            background: rgba(168, 85, 247, 0.1);
-            border-color: rgba(168, 85, 247, 0.4);
-            box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);
-            transform: scale(1.02);
-            color: #fff;
-        }
-    </style>
+  /* ---------- CUSTOM CURSOR ---------- */
+  .cur-dot,.cur-ring{position:fixed;left:0;top:0;z-index:999;pointer-events:none;border-radius:50%;
+    transform:translate(-50%,-50%);will-change:transform;display:none}
+  @media (hover:hover) and (pointer:fine){.cur-dot,.cur-ring{display:block}}
+  .cur-dot{width:7px;height:7px;background:#fff;box-shadow:0 0 12px 2px var(--accent)}
+  .cur-ring{width:38px;height:38px;border:1.5px solid rgba(255,255,255,.55);
+    transition:width .25s,height .25s,background .25s,border-color .25s;
+    backdrop-filter:blur(2px)}
+  .cur-ring.hover{width:62px;height:62px;background:rgba(182,107,255,.18);border-color:var(--accent)}
+  .cur-ring.down{width:26px;height:26px}
+</style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
+<!-- Положи видео рядом с index.html и назови rain.mp4 -->
+<div id="bg-fallback"></div>
+<video id="bg-video" src="rain.mp4" loop muted playsinline preload="auto"></video>
+<canvas id="rain"></canvas>
+<!-- Положи трек рядом с index.html и назови track.mp3 -->
+<audio id="music" src="track.mp3" loop preload="auto"></audio>
+<div class="vignette"></div>
 
-    <div class="profile-card">
-        <img class="avatar" src="https://dicebear.com" alt="Avatar">
-        
-        <div class="nickname">LIMJO-SWAG</div>
-        
-        <div class="status">nobody wants to die</div>
+<div id="enter"><span>press to continue</span></div>
 
-        <div class="links-container">
-            <a href="https://steamcommunity.com" target="_blank" class="btn-link">Steam Профиль</a>
-            <a href="https://t.me" target="_blank" class="btn-link">Telegram</a>
-            <a href="https://discord.com" target="_blank" class="btn-link">Discord</a>
-        </div>
+<main>
+  <section class="card" id="card">
+    <div class="avatar">
+      П
+      <!-- Положи аватарку рядом и назови avatar.jpg -->
+      <img src="avatar.png" alt="" onerror="this.remove()">
     </div>
+    <h1>@половинкаменя</h1>
+    <p class="sub"><span id="typed"></span><i></i></p>
 
+    <nav class="links">
+      <a class="link" href="https://steamcommunity.com/id/ТВОЙ_НИК" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 0a12 12 0 0 0-12 11.4l6.4 2.6a3.4 3.4 0 0 1 1.9-.6h.2l2.9-4.1v-.1a4.5 4.5 0 1 1 4.5 4.5h-.1l-4.1 3a3.4 3.4 0 0 1-6.7.8L.4 15.4A12 12 0 1 0 12 0Zm-4.5 18.2-1.5-.6a2.6 2.6 0 0 0 4.9-.3 2.6 2.6 0 0 0-1.9-3.4l1.6.6a1.9 1.9 0 1 1-3.1 3.7Zm9-6.4a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0-.8a2.2 2.2 0 1 0 0-4.5 2.2 2.2 0 0 0 0 4.5Z"/></svg>
+        <span>Steam Профиль</span>
+      </a>
+      <a class="link" href="https://t.me/ТВОЙ_НИК" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M9.8 15.3 9.4 20c.6 0 .9-.3 1.2-.6l2.9-2.8 6 4.4c1.1.6 1.9.3 2.2-1L24 3.6c.4-1.6-.6-2.2-1.6-1.8L1.2 10c-1.5.6-1.5 1.4-.3 1.8l5.4 1.7L19 5.6c.6-.4 1.1-.2.7.2L9.8 15.3Z"/></svg>
+        <span>Telegram</span>
+      </a>
+      <a class="link" href="https://discord.com/users/ТВОЙ_ID" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M20.3 4.4A19.8 19.8 0 0 0 15.4 3l-.6 1.3a18.3 18.3 0 0 0-5.6 0L8.6 3a19.7 19.7 0 0 0-4.9 1.5C.6 9 -.2 13.4.2 17.8a19.9 19.9 0 0 0 6 3l1.3-2.1c-.7-.3-1.4-.6-2-1l.5-.4a14.2 14.2 0 0 0 12 0l.5.4c-.6.4-1.300.7-2 1l1.300 2.100a19.800 19.800 0 0 0 6-3c.5-5.100-.800-9.500-3.500-13.400ZM8 15.100c-1.200 0-2.100-1.100-2.100-2.400s.9-2.400 2.100-2.400 2.100 1.100 2.100 2.400-.9 2.400-2.100 2.400Zm8 0c-1.200 0-2.100-1.100-2.100-2.400s.9-2.400 2.100-2.400 2.100 1.100 2.100 2.400-.9 2.400-2.100 2.400Z"/></svg>
+        <span>Discord</span>
+      </a>
+    </nav>
+
+    <div class="player" id="player">
+      <button id="pp" aria-label="Играть / пауза">
+        <svg id="ico-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+        <svg id="ico-play" viewBox="0 0 24 24" style="display:none"><path d="M7 4v16l13-8z"/></svg>
+      </button>
+      <div class="track">♪ <b id="trackName"></b></div>
+      <input type="range" id="vol" min="0" max="100" value="50" aria-label="Громкость">
+    </div>
+  </section>
+</main>
+
+<button id="snd" aria-label="Звук">
+  <svg id="ico-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3Zm13.500 3A4.500 4.500 0 0 0 14 8v8a4.500 4.500 0 0 0 2.500-4Zm-2.500-8.800v2.100a7 7 0 0 1 0 13.400v2.100a9 9 0 0 0 0-17.600Z"/></svg>
+  <svg id="ico-off" viewBox="0 0 24 24" style="display:none"><path d="M16.500 12A4.500 4.500 0 0 0 14 8v2.200l2.500 2.500V12ZM19 12a6.800 6.800 0 0 1-.900 3.400l1.500 1.500A8.800 8.800 0 0 0 21 12a9 9 0 0 0-7-8.800v2.100A7 7 0 0 1 19 12ZM4.300 3 3 4.300 7.700 9H3v6h4l5 5v-6.700l4.200 4.200c-.7.500-1.400.9-2.200 1.200v2.100a9 9 0 0 0 3.600-1.800l2.100 2.100 1.300-1.300L4.300 3ZM12 4 9.900 6.100 12 8.200V4Z"/></svg>
+</button>
+
+<div class="cur-ring" id="ring"></div>
+<div class="cur-dot" id="dot"></div>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const video = $('#bg-video'), enter = $('#enter'), card = $('#card'), music = $('#music');
+  const TRACK_NAME = 'название трека'; // ← впиши сюда название
+  $('#trackName').textContent = TRACK_NAME;
+  const SUBTITLE = Array.from('🌧🌧🌧');
+
+  /* ---------- Видео / запасной дождь ---------- */
+  video.addEventListener('error', () => document.body.classList.add('no-video'));
+  video.addEventListener('loadeddata', () => $('#bg-fallback').style.opacity = 0);
+  if (video.error) document.body.classList.add('no-video');
+
+  /* ---------- Press to continue ---------- */
+  let entered = false;
+  function go() {
+    if (entered) return; entered = true;
+    document.body.classList.add('entered');
+    enter.classList.add('hide');
+    video.muted = false; video.volume = .3;      // дождь тише, чтобы музыка была главной
+    music.volume = $('#vol').value / 100;
+    music.play().then(updatePP).catch(updatePP);
+    video.play().catch(() => { video.muted = true; video.play().catch(()=>{}); syncIcon(); });
+    syncIcon();
+    typeText();
+  }
+  enter.addEventListener('click', go);
+  addEventListener('keydown', go);
+  addEventListener('touchstart', go, {passive:true});
+  video.play().catch(()=>{}); // фон играет (без звука) ещё до клика
+
+  /* ---------- Звук ---------- */
+  function syncIcon(){
+    $('#ico-on').style.display  = video.muted ? 'none' : '';
+    $('#ico-off').style.display = video.muted ? '' : 'none';
+  }
+  $('#snd').addEventListener('click', () => {
+    video.muted = !video.muted; music.muted = video.muted; syncIcon();
+  });
+
+  /* ---------- Музыка ---------- */
+  function updatePP(){
+    $('#ico-pause').style.display = music.paused ? 'none' : '';
+    $('#ico-play').style.display  = music.paused ? '' : 'none';
+  }
+  $('#pp').addEventListener('click', () => { music.paused ? music.play() : music.pause(); updatePP(); });
+  $('#vol').addEventListener('input', e => music.volume = e.target.value / 100);
+  music.addEventListener('error', () => $('#player').style.display = 'none'); // нет трека — плеера нет
+
+  /* ---------- Печатающийся подзаголовок ---------- */
+  function typeText(){
+    const el = $('#typed'); let i = 0;
+    setTimeout(function tick(){
+      el.textContent = SUBTITLE.slice(0, ++i).join('');
+      if (i < SUBTITLE.length) setTimeout(tick, 70 + Math.random()*60);
+    }, 1100);
+  }
+
+  /* ---------- Курсор ---------- */
+  const dot = $('#dot'), ring = $('#ring');
+  let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
+  addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px,${my}px) translate(-50%,-50%)`;
+  });
+  (function loop(){
+    rx += (mx - rx) * .17; ry += (my - ry) * .17;
+    ring.style.transform = `translate(${rx}px,${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(loop);
+  })();
+  document.addEventListener('mouseover', e => {
+    ring.classList.toggle('hover', !!e.target.closest('a,button,#enter'));
+  });
+  addEventListener('mousedown', () => ring.classList.add('down'));
+  addEventListener('mouseup',   () => ring.classList.remove('down'));
+
+  /* ---------- Наклон карточки + свет за мышкой ---------- */
+  addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+    const px = (e.clientX / innerWidth - .5), py = (e.clientY / innerHeight - .5);
+    if (entered) card.style.transform = `rotateY(${px*8}deg) rotateX(${-py*8}deg)`;
+  });
+  addEventListener('mouseleave', () => card.style.transform = '');
+
+  /* ---------- Запасной canvas-дождь (если нет rain.mp4) ---------- */
+  const cv = $('#rain'), ctx = cv.getContext('2d');
+  let W, H, drops = [];
+  function resize(){
+    W = cv.width = innerWidth; H = cv.height = innerHeight;
+    drops = Array.from({length: Math.floor(W/6)}, () => mk(true));
+  }
+  function mk(rand){
+    return { x: Math.random()*W, y: rand ? Math.random()*H : -20,
+             l: 12 + Math.random()*22, v: 14 + Math.random()*16, a: .15 + Math.random()*.35 };
+  }
+  addEventListener('resize', resize); resize();
+  (function draw(){
+    ctx.clearRect(0,0,W,H);
+    if (document.body.classList.contains('no-video')){
+      ctx.lineWidth = 1;
+      for (const d of drops){
+        ctx.strokeStyle = `rgba(190,215,235,${d.a})`;
+        ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - d.l*.18, d.y + d.l); ctx.stroke();
+        d.y += d.v; d.x -= d.v*.18;
+        if (d.y > H) Object.assign(d, mk(false));
+      }
+    }
+    requestAnimationFrame(draw);
+  })();
+})();
+</script>
 </body>
 </html>
