@@ -4,6 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>@половинкаменя</title>
+<meta name="description" content="🌧🌧🌧">
+<meta name="theme-color" content="#7b3fe4">
+<link rel="icon" href="avatar.png">
+<!-- Превью ссылки (Telegram, Discord и т.д.) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="@половинкаменя">
+<meta property="og:title" content="@половинкаменя">
+<meta property="og:description" content="🌧🌧🌧">
+<meta property="og:url" content="https://limjo-swag.github.io/">
+<meta property="og:image" content="https://limjo-swag.github.io/avatar.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="@половинкаменя">
+<meta name="twitter:description" content="🌧🌧🌧">
+<meta name="twitter:image" content="https://limjo-swag.github.io/avatar.png">
 <style>
   :root{
     --accent:#b66bff;
@@ -40,7 +54,7 @@
   @keyframes pulse{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
 
   /* ---------- CARD (LIQUID GLASS) ---------- */
-  main{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:20px;
+  main{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:20px;overflow-y:auto;scrollbar-width:none;
     perspective:1200px}
   .card{
     --mx:50%;--my:0%;
@@ -56,10 +70,10 @@
       0 30px 80px rgba(0,0,0,.55),
       0 0 calc(60px + var(--beat,0)*70px) rgba(182,107,255,calc(.12 + var(--beat,0)*.3));
     transform-style:preserve-3d;transition:transform .25s ease-out;
-    opacity:0;transform:translateY(30px) scale(.96);
+    opacity:0;translate:0 30px;
   }
   body.entered .card{animation:cardIn 1.1s cubic-bezier(.2,.9,.2,1) .25s forwards}
-  @keyframes cardIn{to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes cardIn{to{opacity:1;translate:0 0}}
   /* light that follows the mouse */
   .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
     background:radial-gradient(260px circle at var(--mx) var(--my),rgba(255,255,255,.22),transparent 60%);
@@ -95,12 +109,12 @@
     border:1px solid rgba(255,255,255,.12);
     box-shadow:inset 0 1px 1px rgba(255,255,255,.35),0 6px 18px rgba(0,0,0,.25);
     transition:transform .3s cubic-bezier(.2,.9,.2,1),background .3s,border-color .3s,box-shadow .3s;
-    opacity:0;transform:translateY(14px)}
+    opacity:0;translate:0 14px}
   body.entered .link{animation:linkIn .7s cubic-bezier(.2,.9,.2,1) forwards}
   body.entered .link:nth-child(1){animation-delay:.7s}
   body.entered .link:nth-child(2){animation-delay:.82s}
   body.entered .link:nth-child(3){animation-delay:.94s}
-  @keyframes linkIn{to{opacity:1;transform:translateY(0)}}
+  @keyframes linkIn{to{opacity:1;translate:0 0}}
   .link::before{content:"";position:absolute;top:0;left:-120%;width:80%;height:100%;
     background:linear-gradient(100deg,transparent,rgba(255,255,255,.25),transparent);
     transform:skewX(-20deg);transition:left .7s ease}
@@ -112,6 +126,13 @@
   .link:active{transform:scale(.98)}
   .link svg{width:24px;height:24px;flex:none;fill:currentColor;opacity:.92}
   .link span{flex:1;text-align:center;margin-right:24px}
+
+  /* ---------- RAIN DROPS ON GLASS ---------- */
+  #drops{position:absolute;inset:0;width:100%;height:100%;border-radius:34px;pointer-events:none}
+
+  /* ---------- LIGHTNING ---------- */
+  #flash{position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .07s linear;
+    background:radial-gradient(ellipse at 30% 0%,rgba(215,228,255,.95),rgba(140,170,255,.4) 55%,transparent 85%)}
 
   /* ---------- MUSIC PLAYER ---------- */
   .player{margin-top:16px;display:flex;flex-direction:column;gap:10px;padding:12px 16px 10px;border-radius:26px;
@@ -150,14 +171,73 @@
     box-shadow:0 0 0 1px rgba(255,255,255,.08),0 12px 40px rgba(0,0,0,.6);
     transition:width .55s cubic-bezier(.3,1.5,.4,1),height .55s cubic-bezier(.3,1.5,.4,1),
       border-radius .55s cubic-bezier(.3,1.5,.4,1),opacity .25s}
-  #island.show{opacity:1;width:230px;height:56px;border-radius:32px}
+  #island.show{opacity:1;width:var(--w,230px);height:56px;border-radius:32px}
   #island .in{display:flex;align-items:center;gap:12px;white-space:nowrap;opacity:0;transform:scale(.7);
     transition:opacity .2s,transform .3s}
   #island.show .in{opacity:1;transform:scale(1);transition:opacity .3s .2s,transform .45s cubic-bezier(.3,1.5,.4,1) .15s}
-  #island .ok{width:30px;height:30px;padding:6px;border-radius:50%;background:#30d158;fill:#fff;flex:none}
+  #island .ok{width:30px;height:30px;border-radius:50%;background:#30d158;flex:none;display:grid;
+    place-items:center;font-size:15px;line-height:1;color:#fff;font-weight:800}
   #island .txt{display:flex;flex-direction:column;line-height:1.25;text-align:left}
   #island b{font-size:14px;font-weight:700}
   #island small{font-size:12px;color:rgba(255,255,255,.6)}
+
+  /* остров: улучшенная версия */
+  #island{top:max(14px,env(safe-area-inset-top))}
+  #island.show{box-shadow:0 0 0 1px rgba(255,255,255,.1),0 14px 44px rgba(0,0,0,.65),
+    0 0 34px color-mix(in srgb,var(--c,#30d158) 40%,transparent)}
+  #island .in{filter:blur(8px);transition:opacity .2s,transform .3s,filter .2s}
+  #island.show .in{filter:blur(0);transition:opacity .3s .2s,transform .45s cubic-bezier(.3,1.5,.4,1) .15s,filter .4s .15s}
+  #island.show .ok{animation:okpop .5s cubic-bezier(.3,1.8,.5,1) .2s both}
+  @keyframes okpop{from{scale:.4}to{scale:1}}
+  #island .ok svg{width:18px;height:18px;fill:#fff}
+  #island.bump{animation:bump .35s cubic-bezier(.3,1.6,.4,1)}
+  @keyframes bump{50%{scale:1.07 .94}}
+  #island .tick{display:none;width:22px;height:22px;flex:none;fill:none;stroke:#30d158;stroke-width:3;
+    stroke-linecap:round;stroke-linejoin:round}
+  #island.ticked .tick{display:block}
+  #island .tick path{stroke-dasharray:1;stroke-dashoffset:1}
+  #island.show.ticked .tick path{animation:draw .5s ease-out .55s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  #island .bar{position:absolute;left:18px;right:18px;bottom:5px;height:2px;border-radius:2px;
+    background:rgba(255,255,255,.28);transform-origin:left;transform:scaleX(0);opacity:0}
+  #island.show .bar{opacity:1;animation:bar var(--ms,2.2s) linear forwards}
+  @keyframes bar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+  /* эквалайзер и бегущая строка в плеере */
+  .eq{display:flex;align-items:flex-end;gap:2px;height:16px;flex:none}
+  .eq i{display:block;width:3px;height:100%;border-radius:2px;transform-origin:bottom;transform:scaleY(.12);
+    background:linear-gradient(#e2b8ff,#8b5cf6)}
+  .track b{display:inline-block}
+  .track b.scroll{animation:mq 9s ease-in-out infinite alternate}
+  @keyframes mq{0%,12%{translate:0 0}88%,100%{translate:var(--shift) 0}}
+  .link:focus-visible,.pbtn:focus-visible,#pp:focus-visible,#snd:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+  /* тексты песен (караоке) */
+  .lyrics{display:none;gap:3px;text-align:center;padding:2px 6px 0;min-height:52px;align-content:center}
+  .lyrics.on{display:grid}
+  .lyrics .cur{font-size:15px;font-weight:700;color:#fff;line-height:1.3;min-height:1.3em;
+    text-shadow:0 0 calc(8px + var(--beat,0) * 18px) rgba(182,107,255,.85)}
+  .lyrics .next{font-size:12px;color:var(--muted);line-height:1.3;min-height:1.3em;opacity:.7}
+  .lyrics .cur.swap{animation:lyin .35s ease-out}
+  @keyframes lyin{from{opacity:0;translate:0 6px;filter:blur(3px)}to{opacity:1;translate:0 0;filter:none}}
+
+  /* большой текст на экране (караоке) */
+  body.lybig .lyrics{display:none!important}
+  #stage{position:fixed;left:0;right:0;bottom:24px;z-index:12;pointer-events:none;text-align:center;
+    display:none;padding:0 5vw}
+  body.haslyr.lybig #stage{display:block}
+  #stage p{margin:0 auto;max-width:min(920px,100%);text-wrap:balance}
+  #stage .sp{font-size:clamp(12px,1.3vw,15px);color:rgba(255,255,255,.3);min-height:1.4em;margin-bottom:4px}
+  #stage .sn{font-size:clamp(13px,1.5vw,17px);color:rgba(255,255,255,.42);min-height:1.4em;margin-top:6px}
+  #stage .sc{font-size:clamp(22px,3.2vw,40px);font-weight:800;line-height:1.2;min-height:1.2em;
+    filter:drop-shadow(0 0 calc(10px + var(--beat,0) * 22px) rgba(182,107,255,.75));
+    scale:calc(1 + var(--beat,0) * .025)}
+  #stage .sc span{display:inline-block;color:transparent;
+    background:linear-gradient(90deg,#fff var(--prog,0%),rgba(255,255,255,.38) var(--prog,0%));
+    -webkit-background-clip:text;background-clip:text}
+  #stage .sc span.swap{animation:sIn .5s cubic-bezier(.2,.9,.2,1)}
+  @keyframes sIn{from{opacity:0;translate:0 16px;filter:blur(6px);letter-spacing:.06em}
+    to{opacity:1;translate:0 0;filter:blur(0);letter-spacing:0}}
 
   /* ---------- SOUND BUTTON ---------- */
   #snd{position:fixed;right:20px;bottom:20px;z-index:20;width:46px;height:46px;border-radius:50%;
@@ -168,12 +248,49 @@
   #snd:hover{transform:scale(1.1)}
   #snd svg{width:20px;height:20px;fill:currentColor}
 
+  /* ---------- GLITCH ---------- */
+  h1{position:relative}
+  h1::before,h1::after{content:attr(data-text);position:absolute;inset:0;text-align:center;
+    pointer-events:none;opacity:0;mix-blend-mode:screen}
+  h1::before{color:#00f0ff}
+  h1::after{color:#ff2bd6}
+  h1.glitch,h1.hov{animation:shine 5s linear infinite,jit .3s steps(2,end) infinite}
+  h1.glitch::before,h1.hov::before{opacity:.9;animation:gl1 .4s steps(1,end) infinite}
+  h1.glitch::after,h1.hov::after{opacity:.9;animation:gl2 .4s steps(1,end) infinite}
+  @keyframes jit{0%{translate:0 0}50%{translate:2px -1px}100%{translate:-2px 1px}}
+  @keyframes gl1{
+    0%{clip-path:inset(0 0 70% 0);translate:-4px 0}
+    20%{clip-path:inset(35% 0 40% 0);translate:3px 1px}
+    40%{clip-path:inset(70% 0 5% 0);translate:-3px -1px}
+    60%{clip-path:inset(10% 0 60% 0);translate:5px 0}
+    80%{clip-path:inset(50% 0 20% 0);translate:-2px 1px}
+    100%{clip-path:inset(0 0 70% 0);translate:4px 0}}
+  @keyframes gl2{
+    0%{clip-path:inset(60% 0 10% 0);translate:4px 0}
+    25%{clip-path:inset(5% 0 75% 0);translate:-5px 1px}
+    50%{clip-path:inset(40% 0 35% 0);translate:3px -1px}
+    75%{clip-path:inset(80% 0 0 0);translate:-4px 0}
+    100%{clip-path:inset(60% 0 10% 0);translate:2px 1px}}
+  #fx{position:fixed;inset:0;z-index:60;pointer-events:none;overflow:hidden}
+  .avatar{cursor:pointer}
+  .avatar.spin{animation:aspin .8s cubic-bezier(.3,1.4,.4,1)}
+  @keyframes aspin{to{rotate:360deg}}
+  .avatar.glitch{animation:avj .3s steps(2,end) infinite}
+  @keyframes avj{
+    0%{translate:-2px 1px;filter:hue-rotate(0deg)}
+    50%{translate:3px -1px;filter:hue-rotate(120deg) saturate(2)}
+    100%{translate:-1px 0;filter:none}}
+  body.storm main{animation:shake .14s linear infinite}
+  @keyframes shake{0%,100%{translate:0 0}25%{translate:1.5px -1px}75%{translate:-1.5px 1px}}
+  #trail{position:fixed;inset:0;width:100%;height:100%;z-index:998;pointer-events:none}
+  @keyframes rs{to{rotate:360deg}}
+
   /* ---------- CUSTOM CURSOR ---------- */
   .cur-dot,.cur-ring{position:fixed;left:0;top:0;z-index:999;pointer-events:none;border-radius:50%;
     transform:translate(-50%,-50%);will-change:transform;display:none}
   @media (hover:hover) and (pointer:fine){.cur-dot,.cur-ring{display:block}}
   .cur-dot{width:7px;height:7px;background:#fff;box-shadow:0 0 12px 2px var(--accent)}
-  .cur-ring{width:38px;height:38px;border:1.5px solid rgba(255,255,255,.55);
+  .cur-ring{width:38px;height:38px;border:1.5px dashed rgba(255,255,255,.6);animation:rs 7s linear infinite;
     transition:width .25s,height .25s,background .25s,border-color .25s;
     backdrop-filter:blur(2px)}
   .cur-ring.hover{width:62px;height:62px;background:rgba(182,107,255,.18);border-color:var(--accent)}
@@ -188,6 +305,7 @@
 <canvas id="rain"></canvas>
 <audio id="music" preload="auto"></audio>
 <div class="vignette"></div>
+<div id="flash"></div>
 
 <div id="enter"><span>press to continue</span></div>
 
@@ -198,7 +316,7 @@
       <!-- Положи аватарку рядом и назови avatar.jpg -->
       <img src="avatar.png" alt="" onerror="this.remove()">
     </div>
-    <h1>@половинкаменя</h1>
+    <h1 id="nick" data-text="@половинкаменя">@половинкаменя</h1>
     <p class="sub"><span id="typed"></span><i></i></p>
 
     <nav class="links">
@@ -226,8 +344,13 @@
           </button>
           <button class="pbtn" id="next" aria-label="Следующий"><svg viewBox="0 0 24 24"><path d="M16 5h2v14h-2zM4 5l11 7-11 7z"/></svg></button>
         </div>
-        <div class="track">♪ <b id="trackName"></b></div>
+        <div class="eq" id="eq"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="track"><b id="trackName"></b></div>
         <input type="range" id="vol" min="0" max="100" value="50" aria-label="Громкость">
+      </div>
+      <div class="lyrics" id="lyrics">
+        <p class="cur" id="lCur"></p>
+        <p class="next" id="lNext"></p>
       </div>
       <div class="prog">
         <span id="tCur">0:00</span>
@@ -235,6 +358,7 @@
         <span id="tLeft">-0:00</span>
       </div>
     </div>
+    <canvas id="drops"></canvas>
   </section>
 </main>
 
@@ -243,13 +367,23 @@
   <svg id="ico-off" viewBox="0 0 24 24" style="display:none"><path d="M16.500 12A4.500 4.500 0 0 0 14 8v2.200l2.500 2.500V12ZM19 12a6.800 6.800 0 0 1-.900 3.400l1.500 1.500A8.800 8.800 0 0 0 21 12a9 9 0 0 0-7-8.800v2.100A7 7 0 0 1 19 12ZM4.300 3 3 4.300 7.700 9H3v6h4l5 5v-6.700l4.200 4.200c-.7.500-1.400.9-2.200 1.200v2.100a9 9 0 0 0 3.600-1.800l2.100 2.100 1.300-1.300L4.300 3ZM12 4 9.900 6.100 12 8.200V4Z"/></svg>
 </button>
 
-<div id="island">
-  <div class="in">
-    <svg class="ok" viewBox="0 0 24 24"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>
-    <div class="txt"><b id="islTitle"></b><small id="islSub"></small></div>
-  </div>
+<div id="stage">
+  <p class="sp" id="sPrev"></p>
+  <p class="sc"><span id="sCur"></span></p>
+  <p class="sn" id="sNext"></p>
 </div>
 
+<div id="island">
+  <div class="in">
+    <div class="ok" id="islIcon">✓</div>
+    <div class="txt"><b id="islTitle"></b><small id="islSub"></small></div>
+    <svg class="tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" pathLength="1"/></svg>
+  </div>
+  <i class="bar"></i>
+</div>
+
+<div id="fx"></div>
+<canvas id="trail"></canvas>
 <div class="cur-ring" id="ring"></div>
 <div class="cur-dot" id="dot"></div>
 
@@ -257,11 +391,17 @@
 (() => {
   const $ = s => document.querySelector(s);
   const video = $('#bg-video'), enter = $('#enter'), card = $('#card'), music = $('#music');
+  const dot = $('#dot'), ring = $('#ring');
+  let storm = false, hotReady = false;
+  const eqBars = Array.from(document.querySelectorAll('#eq i')), EQ_BINS = [2, 5, 12, 30, 70];
+  const eqLevel = [.12, .12, .12, .12, .12];
+  const lyBox = $('#lyrics'), lyCur = $('#lCur'), lyNext = $('#lNext');
+  const stage = $('#stage'), sPrev = $('#sPrev'), sCur = $('#sCur'), sNext = $('#sNext');
+  let lyr = [], lyrIdx = -1, lyrShown = -2;
   // ← Треки: файл лежит рядом с index.html, name — то, что покажется в плеере
   const TRACKS = [
-    { src: 'track.mp3',  name: 'трек 1' },
-    { src: 'track2.mp3', name: 'трек 2' },
-    { src: 'track3.mp3', name: 'трек 3' },
+    { src: 'track.mp3',  name: 'gothviolence - cut my face',       lrc: 'track.lrc'  },
+    { src: 'track2.mp3', name: 'вышелпокурить - нам не повезло',   lrc: 'track2.lrc' },
   ];
   const SUBTITLE = Array.from('🌧🌧🌧');
 
@@ -279,6 +419,7 @@
     video.muted = false; video.volume = .3;      // дождь тише, чтобы музыка была главной
     music.volume = $('#vol').value / 100;
     initAudio();
+    setTimeout(lightning, 5000); setTimeout(() => glitch(500), 1600); setTimeout(() => hotReady = true, 600);                 // первая молния через 5 сек
     music.play().then(updatePP).catch(updatePP);
     video.play().catch(() => { video.muted = true; video.play().catch(()=>{}); syncIcon(); });
     syncIcon();
@@ -320,6 +461,8 @@
   function load(i, play){
     cur = i; music.src = TRACKS[i].src;
     $('#trackName').textContent = TRACKS[i].name;
+    requestAnimationFrame(fitTrack);
+    loadLyrics(i);
     seek.value = 0; setP(seek, 0);
     $('#tCur').textContent = '0:00'; $('#tLeft').textContent = '-0:00';
     if (play) music.play().then(updatePP).catch(updatePP); else updatePP();
@@ -328,6 +471,7 @@
     const i = pick(cur, dir);
     if (i < 0) { $('#player').style.display = 'none'; return; }   // ни одного трека нет — плеера нет
     load(i, entered && !userPaused);
+    if (entered) glitch(380);                                     // смена трека — глитч
   }
 
   $('#pp').addEventListener('click', () => {
@@ -360,10 +504,24 @@
 
   /* ---------- Dynamic Island ---------- */
   const island = $('#island'); let islandT;
-  function pop(title, sub){
-    $('#islTitle').textContent = title; $('#islSub').textContent = sub;
+  island.addEventListener('animationend', e => { if (e.animationName === 'bump') island.classList.remove('bump'); });
+  function pop(title, sub, icon = '✓', color = '#30d158', ms = 2200, opts = {}){
+    const was = island.classList.contains('show');
+    $('#islTitle').textContent = title; $('#islSub').textContent = sub || '';
+    const ic = $('#islIcon');
+    if (icon.charAt(0) === '<') ic.innerHTML = icon; else ic.textContent = icon;
+    ic.style.background = color;
+    island.classList.toggle('ticked', !!opts.tick);
+    island.style.setProperty('--c', color);
+    island.style.setProperty('--ms', ms + 'ms');
+    island.style.setProperty('--w', Math.max(210, $('#island .in').offsetWidth + 44) + 'px');
+    const bar = $('#island .bar');
+    if (was){                                              // остров уже открыт — «толчок» и перезапуск таймера
+      island.classList.remove('bump'); void island.offsetWidth; island.classList.add('bump');
+      bar.style.animation = 'none'; void bar.offsetWidth; bar.style.animation = '';
+    }
     island.classList.add('show'); clearTimeout(islandT);
-    islandT = setTimeout(() => island.classList.remove('show'), 2200);
+    islandT = setTimeout(() => island.classList.remove('show'), ms);
   }
   async function copy(text){
     try { await navigator.clipboard.writeText(text); }
@@ -374,10 +532,12 @@
       t.remove();
     }
   }
+  const DISCORD_SVG = $('#discord svg').outerHTML;
   $('#discord').addEventListener('click', async e => {
     e.preventDefault();
     await copy('firesh00ter');
-    pop('Скопировано', 'firesh00ter');
+    if (navigator.vibrate) navigator.vibrate(18);
+    pop('Ник скопирован', 'firesh00ter', DISCORD_SVG, '#5865F2', 2600, { tick: true });
   });
 
   /* ---------- Печатающийся подзаголовок ---------- */
@@ -415,14 +575,110 @@
       target = Math.pow(Math.max(0, lvl / Math.max(peak, .15)), 3);   // реагирует на сильные удары
     }
     env += (target - env) * (target > env ? .55 : .12);         // быстрый удар, плавный спад
+    for (let k = 0; k < 5; k++){                                // эквалайзер в плеере
+      let v = .12;
+      if (!music.paused){
+        v = analyser ? Math.max(.12, freq[EQ_BINS[k]] / 255 * 1.15)
+                     : .25 + .5 * Math.abs(Math.sin(performance.now() / 260 + k * 1.7));
+      }
+      eqLevel[k] += (v - eqLevel[k]) * .35;
+      eqBars[k].style.transform = `scaleY(${Math.min(1, eqLevel[k]).toFixed(3)})`;
+    }
+    if (lyr.length){                                            // какая строка текста сейчас
+      const t = music.currentTime + .12;
+      while (lyrIdx + 1 < lyr.length && lyr[lyrIdx + 1].t <= t) lyrIdx++;
+      while (lyrIdx >= 0 && lyr[lyrIdx].t > t) lyrIdx--;
+      if (lyrIdx !== lyrShown){ lyrShown = lyrIdx; renderLyr(); }
+      if (lyrIdx >= 0 && document.body.classList.contains('lybig')){   // заливка строки цветом по времени
+        const a = lyr[lyrIdx].t, b = lyr[lyrIdx + 1] ? lyr[lyrIdx + 1].t : a + 4;
+        const dur = Math.min(Math.max(b - a, .5), 6) * .9;
+        stage.style.setProperty('--prog', Math.min(100, Math.max(0, (t - a) / dur * 100)).toFixed(1) + '%');
+      }
+    }
     card.style.setProperty('--beat', env.toFixed(3));
+    stage.style.setProperty('--beat', env.toFixed(3));
     card.style.scale = 1 + env * .022;                          // сила «дёрганья» — число .022
     video.style.filter = `brightness(${(.62 + env * .14).toFixed(3)}) saturate(1.1)`;
+    dot.style.scale = 1 + env * 1.6;                            // курсор тоже бьётся под бас
+    ring.style.scale = 1 + env * .3;
     requestAnimationFrame(beat);
   })();
 
+  /* ---------- Капли на стекле ---------- */
+  const dc = $('#drops'), dctx = dc.getContext('2d');
+  let dw = 0, dh = 0; const drops = [];
+  function sizeDrops(){
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    dw = card.offsetWidth; dh = card.offsetHeight;
+    dc.width = dw * dpr; dc.height = dh * dpr;
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  sizeDrops(); addEventListener('resize', sizeDrops);
+  if (window.ResizeObserver) new ResizeObserver(sizeDrops).observe(card);
+
+  function spawnDrop(){
+    const big = Math.random() < .25;
+    drops.push({
+      x: Math.random() * dw, y: Math.random() * dh * .9,
+      r: big ? 3 + Math.random() * 2.6 : 1.2 + Math.random() * 1.8,
+      age: 0, ttl: 400 + Math.random() * 600,
+      vy: 0, len: 0, slide: big && Math.random() < .55, wait: 30 + Math.random() * 90
+    });
+  }
+  (function glass(){
+    dctx.clearRect(0, 0, dw, dh);
+    if (entered && drops.length < (storm ? 90 : 34) && Math.random() < (storm ? .3 : .07)) spawnDrop();
+    for (let i = drops.length - 1; i >= 0; i--){
+      const d = drops[i]; d.age++;
+      // бас стряхивает крупные капли — они срываются вниз
+      if (!d.slide && d.r > 2.4 && env > .6 && Math.random() < .03){ d.slide = true; d.wait = 0; }
+      if (d.slide && d.age > d.wait){
+        if (Math.random() < .04) d.vy = .4 + Math.random() * 1.6;   // капля то стоит, то дёргается вниз
+        d.vy *= .985;
+        d.y += d.vy; d.len = Math.min(d.len + d.vy, 70);
+        if (d.vy > .05) d.x += (Math.random() - .5) * .25;
+      }
+      if (d.age > d.ttl || d.y > dh + 10){ drops.splice(i, 1); continue; }
+
+      dctx.globalAlpha = Math.min(1, d.age / 20) * Math.min(1, (d.ttl - d.age) / 40);
+      const r = d.r * (1 + env * .25);                              // под бас капли «дышат»
+      if (d.len > 2){                                               // след за каплей
+        const tg = dctx.createLinearGradient(0, d.y - d.len, 0, d.y);
+        tg.addColorStop(0, 'rgba(255,255,255,0)'); tg.addColorStop(1, 'rgba(255,255,255,.14)');
+        dctx.strokeStyle = tg; dctx.lineWidth = d.r * .7; dctx.lineCap = 'round';
+        dctx.beginPath(); dctx.moveTo(d.x, d.y - d.len); dctx.lineTo(d.x, d.y); dctx.stroke();
+      }
+      const g = dctx.createRadialGradient(d.x - r * .35, d.y - r * .4, r * .1, d.x, d.y, r);
+      g.addColorStop(0, 'rgba(255,255,255,.5)');
+      g.addColorStop(.5, 'rgba(255,255,255,.07)');
+      g.addColorStop(1, 'rgba(0,0,0,.25)');
+      dctx.fillStyle = g;
+      dctx.beginPath(); dctx.arc(d.x, d.y, r, 0, 6.2832); dctx.fill();
+      dctx.fillStyle = 'rgba(255,255,255,.75)';                    // блик
+      dctx.beginPath(); dctx.arc(d.x - r * .35, d.y - r * .4, Math.max(.5, r * .2), 0, 6.2832); dctx.fill();
+    }
+    dctx.globalAlpha = 1;
+    requestAnimationFrame(glass);
+  })();
+
+  /* ---------- Молнии ---------- */
+  const flash = $('#flash');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;   // у кого включено «меньше анимации» — без вспышек
+  function strike(done){                                                  // одна вспышка
+    if (calm){ if (done) done(); return; }
+    const seq = [.55, 0, .85, 0, .4, 0]; let i = 0;
+    (function s(){
+      flash.style.opacity = seq[i++];
+      if (i < seq.length) setTimeout(s, i % 2 ? 70 : 110 + Math.random() * 90);
+      else if (done) done();
+    })();
+  }
+  function lightning(){
+    if (calm) return;
+    strike(() => setTimeout(lightning, 9000 + Math.random() * 14000));   // следующая через 9–23 сек
+  }
+
   /* ---------- Курсор ---------- */
-  const dot = $('#dot'), ring = $('#ring');
   let mx = innerWidth/2, my = innerHeight/2, rx = mx, ry = my;
   addEventListener('mousemove', e => {
     mx = e.clientX; my = e.clientY;
@@ -449,12 +705,226 @@
   });
   addEventListener('mouseleave', () => card.style.transform = '');
 
+  /* ---------- Глитч ---------- */
+  const nick = $('#nick'), fx = $('#fx'), avatar = $('.avatar');
+  function screenGlitch(){                                  // цветные полосы на весь экран
+    for (let i = 0; i < 7; i++){
+      const s = document.createElement('div');
+      const cyan = Math.random() < .5;
+      s.style.cssText = `position:absolute;left:0;right:0;top:${Math.random() * 100}%;height:${2 + Math.random() * 8}%;` +
+        `background:${cyan ? 'rgba(0,240,255,.16)' : 'rgba(255,43,214,.16)'};` +
+        `transform:translateX(${(Math.random() - .5) * 60}px);mix-blend-mode:screen`;
+      fx.appendChild(s);
+      setTimeout(() => s.remove(), 110 + Math.random() * 120);
+    }
+  }
+  function glitch(ms = 450, screen = true){
+    nick.classList.add('glitch'); avatar.classList.add('glitch');
+    if (screen && !calm) screenGlitch();
+    setTimeout(() => { nick.classList.remove('glitch'); avatar.classList.remove('glitch'); }, ms);
+  }
+  nick.addEventListener('mouseenter', () => nick.classList.add('hov'));
+  nick.addEventListener('mouseleave', () => nick.classList.remove('hov'));
+  nick.addEventListener('click', () => glitch(600));
+  (function autoGlitch(){                                   // случайный глитч раз в 6–15 сек
+    setTimeout(() => { if (entered) glitch(320, Math.random() < .5); autoGlitch(); }, 6000 + Math.random() * 9000);
+  })();
+
+  /* ---------- Тексты песен (.lrc с таймкодами) ---------- */
+  function parseLRC(txt){
+    const out = []; let offset = 0;
+    for (const raw of txt.split(/\r?\n/)){
+      const o = raw.match(/^\[offset:\s*([+-]?\d+)\]/i);
+      if (o){ offset = +o[1] / 1000; continue; }
+      const tags = [...raw.matchAll(/\[(\d+):(\d+(?:[.:]\d+)?)\]/g)];
+      if (!tags.length) continue;                              // служебные теги [ar:...] и пустые строки
+      const s = raw.replace(/\[[^\]]*\]/g, '').trim();
+      for (const m of tags) out.push({ t: +m[1] * 60 + parseFloat(m[2].replace(':', '.')) - offset, s });
+    }
+    return out.sort((a, b) => a.t - b.t);
+  }
+  function renderLyr(){
+    const c = lyrIdx >= 0 ? lyr[lyrIdx].s : '';
+    const n = lyr[lyrIdx + 1] ? lyr[lyrIdx + 1].s : '';
+    const p = lyrIdx >= 1 ? lyr[lyrIdx - 1].s : '';
+    // маленький блок в плеере (запасной вариант для низких экранов)
+    lyCur.textContent = lyrIdx >= 0 ? (c || '♪') : '';
+    lyNext.textContent = n;
+    lyCur.classList.remove('swap'); void lyCur.offsetWidth; lyCur.classList.add('swap');
+    // большой текст на экране
+    sPrev.textContent = p; sNext.textContent = n;
+    sCur.textContent = lyrIdx >= 0 ? (c || '♪ ♪ ♪') : '';
+    stage.style.setProperty('--prog', '0%');
+    sCur.classList.remove('swap'); void sCur.offsetWidth; sCur.classList.add('swap');
+  }
+  function loadLyrics(i){
+    lyr = []; lyrIdx = -1; lyrShown = -2;
+    lyBox.classList.remove('on'); lyCur.textContent = ''; lyNext.textContent = '';
+    document.body.classList.remove('haslyr');
+    sPrev.textContent = ''; sCur.textContent = ''; sNext.textContent = '';
+    // если lrc не указан, ищем файл с тем же именем, что и у трека: track2.mp3 → track2.lrc
+    const f = TRACKS[i].lrc || TRACKS[i].src.replace(/\.[^./]+$/, '.lrc');
+    fetch(f).then(r => r.ok ? r.text() : Promise.reject())
+      .then(t => {
+        if (cur !== i) return;                                 // успели переключить трек — не показываем
+        const parsed = parseLRC(t);
+        if (parsed.length){ lyr = parsed; lyBox.classList.add('on'); document.body.classList.add('haslyr'); }
+      })
+      .catch(() => {});                                        // файла нет — блока с текстом тоже нет
+  }
+
+  /* ---------- Где показывать текст: большой под карточкой или маленький в плеере ---------- */
+  function placeLyrics(){
+    const extra = document.body.classList.contains('lybig') ? 0 : (lyBox.offsetHeight ? lyBox.offsetHeight + 10 : 0);
+    const space = (innerHeight - (card.offsetHeight - extra)) / 2;     // свободное место под карточкой
+    document.body.classList.toggle('lybig', space >= 120 && innerWidth >= 520);
+    stage.style.bottom = Math.max(12, (space - 108) / 2) + 'px';
+  }
+  addEventListener('resize', placeLyrics);
+  if (window.ResizeObserver) new ResizeObserver(placeLyrics).observe(card);
+  placeLyrics();
+
+  /* ---------- Бегущая строка, если название не влезает ---------- */
+  function fitTrack(){
+    const b = $('#trackName'), box = b.parentElement;
+    b.classList.remove('scroll'); b.style.removeProperty('--shift');
+    const over = b.offsetWidth - box.clientWidth;
+    if (over > 2){
+      b.style.setProperty('--shift', -(over + 6) + 'px');
+      b.style.animationDuration = Math.max(5, over / 14 + 4) + 's';
+      b.classList.add('scroll');
+    }
+  }
+  addEventListener('resize', fitTrack);
+
+  /* ---------- Пасхалки ---------- */
+  let stormT;
+  function startStorm(){
+    if (storm) return; storm = true;
+    document.body.classList.add('storm');
+    pop('Шторм', 'держись крепче', '⛈', '#6366f1', 2600);
+    glitch(700);
+    (function hits(){ if (!storm) return; strike(); setTimeout(hits, 1800 + Math.random() * 3200); })();
+    stormT = setTimeout(endStorm, 22000);
+  }
+  function endStorm(){
+    storm = false; document.body.classList.remove('storm');
+    pop('Стихло', 'дождь остался 🌧', '🌧', '#38bdf8', 2000);
+  }
+
+  // 1) клик по аватарке: крутится, а на 5-й раз начинается шторм
+  const OUCH = ['ай!', 'не трогай 🌧', 'щекотно', 'хватит', 'я не кнопка'];
+  let aClicks = 0, aT;
+  avatar.addEventListener('click', () => {
+    avatar.classList.remove('spin'); void avatar.offsetWidth; avatar.classList.add('spin');
+    glitch(350);
+    aClicks++; clearTimeout(aT); aT = setTimeout(() => aClicks = 0, 1500);
+    if (aClicks >= 5){ aClicks = 0; startStorm(); }
+    else pop(OUCH[Math.floor(Math.random() * OUCH.length)], aClicks >= 3 ? 'ещё чуть-чуть…' : '', '👆', '#8b5cf6', 1400);
+  });
+
+  // 2) клик по 🌧🌧🌧 — молния
+  $('.sub').addEventListener('click', () => { strike(); pop('Гроза', '', '⚡', '#eab308', 1200); });
+
+  // 3) konami code, слова «storm»/«шторм»/«glitch»/«глитч», пробел = пауза
+  const KONAMI = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+  const RU = { b: 'и', a: 'ф' };
+  let kpos = 0, typed = '';
+  addEventListener('keydown', e => {
+    if (!hotReady) return;
+    const k = e.key, kl = k.toLowerCase(), want = KONAMI[kpos];
+    if (k === want || kl === want || kl === RU[want]){
+      if (++kpos === KONAMI.length){
+        kpos = 0;
+        pop('KONAMI', '+30 жизней', '🎮', '#f59e0b', 2600); glitch(1800); startStorm();
+      }
+    } else kpos = (k === KONAMI[0]) ? 1 : 0;
+
+    if (k.length === 1){
+      typed = (typed + kl).slice(-8);
+      if (/storm$|шторм$/.test(typed)) startStorm();
+      if (/glitch$|глитч$/.test(typed)){ glitch(1400); pop('Глитч', 'что-то сломалось?', '👾', '#ec4899', 1800); }
+    }
+    const t = e.target && e.target.closest ? e.target : document.body;
+    if (k === ' ' && !t.closest('button,a,input')){ e.preventDefault(); $('#pp').click(); }
+  });
+
+  // 4) вкладка зовёт назад
+  const TITLE0 = document.title;
+  document.addEventListener('visibilitychange', () => { document.title = document.hidden ? '🌧 вернись...' : TITLE0; });
+
+  // 5) если долго ничего не трогать
+  let idleT;
+  function resetIdle(){
+    clearTimeout(idleT);
+    idleT = setTimeout(() => { if (entered) pop('ты тут?', 'дождь всё ещё идёт', '💤', '#64748b', 2600); }, 30000);
+  }
+  addEventListener('mousemove', resetIdle); addEventListener('keydown', resetIdle); resetIdle();
+
+  // 6) для тех, кто открыл консоль
+  console.log('%c@половинкаменя %c🌧  попробуй: 5 кликов по аватарке, слово storm, konami code',
+    'color:#b66bff;font-weight:900;font-size:16px', 'color:#999');
+
+  /* ---------- Курсор: хвост и брызги по клику ---------- */
+  const tc = $('#trail'), tctx = tc.getContext('2d');
+  const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+  let tw = 0, th = 0; const pts = [], ripples = [], sparks = [];
+  function sizeTrail(){
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    tw = innerWidth; th = innerHeight; tc.width = tw * dpr; tc.height = th * dpr;
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  sizeTrail(); addEventListener('resize', sizeTrail);
+  if (fine){
+    addEventListener('mousemove', e => {
+      pts.push({ x: e.clientX, y: e.clientY, t: performance.now() });
+      if (pts.length > 60) pts.shift();
+    });
+    addEventListener('mousedown', e => {
+      const now = performance.now();
+      ripples.push({ x: e.clientX, y: e.clientY, t: now });
+      for (let i = 0; i < 9; i++){
+        const a = Math.random() * 6.2832, v = 1.5 + Math.random() * 3.5;
+        sparks.push({ x: e.clientX, y: e.clientY, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, t: now });
+      }
+    });
+  }
+  (function trailLoop(){
+    tctx.clearRect(0, 0, tw, th);
+    if (fine){
+      const now = performance.now(), LIFE = 480;
+      while (pts.length && now - pts[0].t > LIFE) pts.shift();
+      tctx.lineCap = 'round'; tctx.lineJoin = 'round';
+      for (let i = 1; i < pts.length; i++){                     // хвост: фиолетовый → голубой
+        const a = 1 - (now - pts[i].t) / LIFE;
+        tctx.strokeStyle = `rgba(${Math.round(182 - 120 * (1 - a))},${Math.round(107 + 120 * (1 - a))},255,${(a * .75).toFixed(3)})`;
+        tctx.lineWidth = 1 + a * 5;
+        tctx.beginPath(); tctx.moveTo(pts[i - 1].x, pts[i - 1].y); tctx.lineTo(pts[i].x, pts[i].y); tctx.stroke();
+      }
+      for (let i = ripples.length - 1; i >= 0; i--){            // круги по воде от клика
+        const r = ripples[i], p = (now - r.t) / 700;
+        if (p >= 1){ ripples.splice(i, 1); continue; }
+        tctx.strokeStyle = `rgba(200,150,255,${((1 - p) * .7).toFixed(3)})`; tctx.lineWidth = 2 * (1 - p) + .5;
+        tctx.beginPath(); tctx.arc(r.x, r.y, 8 + p * 55, 0, 6.2832); tctx.stroke();
+        tctx.beginPath(); tctx.arc(r.x, r.y, 4 + p * 28, 0, 6.2832); tctx.stroke();
+      }
+      for (let i = sparks.length - 1; i >= 0; i--){             // брызги
+        const s = sparks[i], p = (now - s.t) / 600;
+        if (p >= 1){ sparks.splice(i, 1); continue; }
+        s.x += s.vx; s.y += s.vy; s.vy += .18; s.vx *= .98;
+        tctx.fillStyle = `rgba(190,215,255,${(1 - p).toFixed(3)})`;
+        tctx.beginPath(); tctx.arc(s.x, s.y, 2 * (1 - p) + .5, 0, 6.2832); tctx.fill();
+      }
+    }
+    requestAnimationFrame(trailLoop);
+  })();
+
   /* ---------- Запасной canvas-дождь (если нет rain.mp4) ---------- */
   const cv = $('#rain'), ctx = cv.getContext('2d');
-  let W, H, drops = [];
+  let W, H, rainDrops = [];
   function resize(){
     W = cv.width = innerWidth; H = cv.height = innerHeight;
-    drops = Array.from({length: Math.floor(W/6)}, () => mk(true));
+    rainDrops = Array.from({length: Math.floor(W/6)}, () => mk(true));
   }
   function mk(rand){
     return { x: Math.random()*W, y: rand ? Math.random()*H : -20,
@@ -465,7 +935,7 @@
     ctx.clearRect(0,0,W,H);
     if (document.body.classList.contains('no-video')){
       ctx.lineWidth = 1;
-      for (const d of drops){
+      for (const d of rainDrops){
         ctx.strokeStyle = `rgba(190,215,235,${d.a})`;
         ctx.beginPath(); ctx.moveTo(d.x, d.y); ctx.lineTo(d.x - d.l*.18, d.y + d.l); ctx.stroke();
         d.y += d.v; d.x -= d.v*.18;
